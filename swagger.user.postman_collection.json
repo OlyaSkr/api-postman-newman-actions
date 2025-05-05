@@ -1,0 +1,477 @@
+{
+	"info": {
+		"_postman_id": "fc4204e4-6b79-44a3-9f96-f5d90506cab9",
+		"name": "Swagger Petstore",
+		"description": "This is a sample server Petstore server.  You can find out more about Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).  For this sample, you can use the api key `special-key` to test the authorization filters.\n\nContact Support:\n Email: apiteam@swagger.io",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44192899",
+		"_collection_link": "https://olha-2512885.postman.co/workspace/a06bd51f-2fc9-452c-9330-fcb85d13514e/collection/44192899-fc4204e4-6b79-44a3-9f96-f5d90506cab9?action=share&source=collection_link&creator=44192899"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "User positive tests",
+					"item": [
+						{
+							"name": "Create new user",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const userName = pm.globals.get(\"userName\")\r",
+											"\r",
+											"const createUser = {\r",
+											"    id: 3,\r",
+											"    username: userName,\r",
+											"    firstName: \"Anna\",\r",
+											"    lastName: \"Kendrick\",\r",
+											"    email: \"anna.kendrick@gmail.com\",\r",
+											"    password: \"gh567890\",\r",
+											"    phone: \"0975841236\",\r",
+											"    userStatus: 1\r",
+											"  };\r",
+											"\r",
+											"  pm.environment.set(\"createUser\", JSON.stringify(createUser))\r",
+											"\r",
+											"  const schema = {\r",
+											"    type: \"object\",\r",
+											"    required: [\"code\", \"type\", \"message\"],\r",
+											"    properties: {\r",
+											"      code: { type: \"number\" },\r",
+											"      type: { type: \"string\" },\r",
+											"      message: { type: \"string\" }\r",
+											"    }\r",
+											"  };\r",
+											"\r",
+											"  pm.environment.set(\"simpleSchema\", JSON.stringify(schema));\r",
+											"\r",
+											"\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const schema = JSON.parse(pm.environment.get(\"simpleSchema\")); \r",
+											"const jsonData = pm.response.json();                            \r",
+											"\r",
+											"const response = pm.response.json();\r",
+											"pm.environment.set(\"savedUsername\", response.username);\r",
+											"console.log(\"Saved Username:\", response.username)\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body matches schema\", function () {\r",
+											"    pm.expect(jsonData).to.have.jsonSchema(schema);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response has required keys\", function () {\r",
+											"    pm.expect(jsonData).to.have.all.keys(\"code\", \"type\", \"message\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Fields have correct types\", function () {\r",
+											"    pm.expect(jsonData.code).to.be.a(\"number\");\r",
+											"    pm.expect(jsonData.type).to.be.a(\"string\");\r",
+											"    pm.expect(jsonData.message).to.be.a(\"string\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{{createUser}}\r\n\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"user"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get user by username",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const userName = pm.globals.get(\"userName\")\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"  pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body contains expected keys\", function () {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData).to.have.all.keys(\"id\", \"username\", \"firstName\", \"lastName\", \"email\", \"password\", \"phone\", \"userStatus\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Correct user returned\", function () {\r",
+											"  const jsonData = pm.response.json();\r",
+											"   pm.expect(jsonData.username).to.eql(userName)\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response fields have correct data types\", function () {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.id).to.be.a(\"number\");\r",
+											"    pm.expect(jsonData.username).to.be.a(\"string\");\r",
+											"    pm.expect(jsonData.firstName).to.be.a(\"string\");\r",
+											"    pm.expect(jsonData.lastName).to.be.a(\"string\");\r",
+											"    pm.expect(jsonData.email).to.be.a(\"string\");\r",
+											"    pm.expect(jsonData.password).to.be.a(\"string\");\r",
+											"    pm.expect(jsonData.phone).to.be.a(\"string\");\r",
+											"    pm.expect(jsonData.userStatus).to.be.a(\"number\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Fields are not empty\", function () {\r",
+											"    const jsonData = pm.response.json();\r",
+											"    pm.expect(jsonData.username).to.not.be.empty;\r",
+											"    pm.expect(jsonData.firstName).to.not.be.empty;\r",
+											"    pm.expect(jsonData.lastName).to.not.be.empty;\r",
+											"    pm.expect(jsonData.email).to.not.be.empty;\r",
+											"    pm.expect(jsonData.password).to.not.be.empty;\r",
+											"    pm.expect(jsonData.phone).to.not.be.empty;\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/user/{{userName}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"{{userName}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update user email",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const userName = pm.globals.get(\"userName\")\r",
+											"\r",
+											"const createUser = {\r",
+											"    id: 3,\r",
+											"    username: userName,\r",
+											"    firstName: \"Anna\",\r",
+											"    lastName: \"Kendrick\",\r",
+											"    email: \"annakendrick@outlook.com\",\r",
+											"    password: \"gh567890\",\r",
+											"    phone: \"0975841236\",\r",
+											"    userStatus: 1\r",
+											"  };\r",
+											"\r",
+											"  pm.environment.set(\"updatedUser\", JSON.stringify(createUser))"
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"  pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response has expected structure\", function () {\r",
+											"  pm.expect(jsonData).to.have.all.keys(\"code\", \"type\", \"message\");\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Fields have correct types\", function () {\r",
+											"  pm.expect(jsonData.code).to.be.a(\"number\");\r",
+											"  pm.expect(jsonData.type).to.be.a(\"string\");\r",
+											"  pm.expect(jsonData.message).to.be.a(\"string\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{{updatedUser}}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/{{userName}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"{{userName}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Check that email is updated",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Status code is 200\", function () {\r",
+											"  pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Email is correct\", function () {\r",
+											"  pm.expect(jsonData.email).to.eql(\"annakendrick@outlook.com\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/user/{{userName}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"{{userName}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete user by username",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"const jsonData = pm.response.json();\r",
+											"\r",
+											"pm.test(\"Response has correct structure\", function () {\r",
+											"  pm.expect(jsonData).to.have.all.keys(\"code\", \"type\", \"message\");\r",
+											"});\r",
+											"\r",
+											"const expectedUsername = pm.globals.get(\"userName\"); \r",
+											"\r",
+											"pm.test(\"Correct user deleted\", function () {\r",
+											"  pm.expect(jsonData.message).to.eql(expectedUsername);\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/user/{{userName}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"{{userName}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "User negative tests",
+					"item": [
+						{
+							"name": "Check non-existent user delete",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/user/{{notExistUser}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"{{notExistUser}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get not exist uaer",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 404\", function () {\r",
+											"    pm.response.to.have.status(404);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body matches expected error object\", function () {\r",
+											"    const res = pm.response.json();\r",
+											"    \r",
+											"    pm.expect(res).to.have.property(\"code\", 1);\r",
+											"    pm.expect(res).to.have.property(\"type\", \"error\");\r",
+											"    pm.expect(res).to.have.property(\"message\", \"User not found\");\r",
+											"});\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/{{invalidUsername}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"user",
+										"{{invalidUsername}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://petstore.swagger.io/v2"
+		}
+	]
+}

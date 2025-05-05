@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "newman": "^6.2.1",
+    "newman-reporter-htmlextra": "^1.23.1"
+  },
+  "scripts": {
+    "test:api": "npx newman run swagger.user.postman_collection.json -r cli,htmlextra --reporter-htmlextra-export ./report/report.html"
+  }
+}

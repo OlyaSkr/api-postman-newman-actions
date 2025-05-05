@@ -1,0 +1,55 @@
+name: Newman report with Postman collection
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test-api:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22.x'
+
+      - name: Install newman and reporter
+        run: |
+          npm install -g newman
+          npm install -g newman-reporter-htmlextra
+
+      - name: Make Directory for results
+        run: mkdir -p testResults
+
+      - name: Replace baseUrl in globals file
+        run: |
+          mkdir -p postman
+          jq --arg baseUrl "$BASE_URL" '
+           .values |= map(if .key == "baseUrl" then .value = $baseUrl else . end)
+          ' swagger.user.postman_globals.json > postman/tmp_env.json
+        env:
+          BASE_URL: ${{ secrets.BASE_URL }}
+
+      - name: Run Positive and Negative tests
+        continue-on-error: true
+        run: |
+          npx newman run swagger.user.postman_collection.json -r cli,htmlextra --reporter-htmlextra-export ./testResults/index.html
+
+      - name: Output the run details
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: testResults
+          path: ./testResults
+
+      - name: Deploy to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v3.7.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./testResults
